@@ -10,11 +10,9 @@ import {
 import { getDoctors } from "../api/auth";
 
 // Modular Components
-import Header from "../components/Header";
 import ReportCard from "../components/ReportCard";
 import AssignDoctorModal from "../components/AssignDoctorModal";
 import AddCommentModal from "../components/AddCommentModal";
-import LogoutModal from "../components/LogoutModal";
 
 // Styles
 import "./Dashboard.css";
@@ -79,20 +77,13 @@ const Dashboard = () => {
     }
   };
 
-  const handleLogoutClick = () => {
-    setShowLogoutModal(true);
-  };
-
-  const confirmLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    toast.success("Logged out successfully");
-    navigate("/");
-  };
-
   const openAssignModal = (report) => {
     setSelectedReport(report);
-    setSelectedDoctors(report.doctors || []);
+    // Extract wallets if doctors are objects {wallet, name}
+    const wallets = (report.doctors || []).map((d) =>
+      typeof d === "string" ? d : d.wallet
+    );
+    setSelectedDoctors(wallets);
     setShowAssignModal(true);
   };
 
@@ -152,8 +143,6 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <Header user={user} onLogout={handleLogoutClick} />
-
       {/* Lab Actions */}
       {user.user_type === "laboratory" && (
         <div className="lab-actions-container">
@@ -215,12 +204,6 @@ const Dashboard = () => {
         onCommentChange={setCommentText}
         onSubmit={handleCommentSubmit}
         submitting={submittingComment}
-      />
-
-      <LogoutModal
-        show={showLogoutModal}
-        onClose={() => setShowLogoutModal(false)}
-        onConfirm={confirmLogout}
       />
     </div>
   );

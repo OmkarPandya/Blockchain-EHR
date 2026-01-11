@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getReportById } from "../api/report";
-import Header from "../components/Header";
+import { getReportById, assignDoctors } from "../api/report";
+import { getDoctors } from "../api/auth";
+import AssignDoctorModal from "../components/AssignDoctorModal";
 import { toast } from "react-hot-toast";
 import "./ReportDetails.css";
 
@@ -11,6 +12,12 @@ const ReportDetails = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const user = JSON.parse(localStorage.getItem("user"));
+
+  // Modal states
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [allDoctors, setAllDoctors] = useState([]);
+  const [selectedDoctors, setSelectedDoctors] = useState([]);
+  const [assigning, setAssigning] = useState(false);
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -35,28 +42,75 @@ const ReportDetails = () => {
       }
     };
 
-    if (id) fetchReport();
+    const fetchDoctors = async () => {
+      try {
+        const response = await getDoctors();
+        setAllDoctors(response.data);
+      } catch (err) {
+        console.error("Error fetching doctors:", err);
+      }
+    };
+
+    if (id) {
+      fetchReport();
+      if (user && user.user_type === "patient") {
+        fetchDoctors();
+      }
+    }
   }, [id, navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    navigate("/");
+  const openAssignModal = () => {
+    if (!report) return;
+    // Map existing doctors to wallets
+    const wallets = (report.doctors || []).map((d) =>
+      typeof d === "string" ? d : d.wallet
+    );
+    setSelectedDoctors(wallets);
+    setShowAssignModal(true);
+  };
+
+  const toggleDoctorSelection = (wallet) => {
+    if (selectedDoctors.includes(wallet)) {
+      setSelectedDoctors(selectedDoctors.filter((w) => w !== wallet));
+    } else {
+      setSelectedDoctors([...selectedDoctors, wallet]);
+    }
+  };
+
+  const handleAssignSubmit = async () => {
+    setAssigning(true);
+    try {
+      await assignDoctors(report._id, selectedDoctors);
+      toast.success("Doctors updated successfully!");
+      setShowAssignModal(false);
+
+      // Refresh report details
+      const response = await getReportById(id);
+      setReport(response.data);
+    } catch (err) {
+      toast.error("Failed to assign doctors");
+    } finally {
+      setAssigning(false);
+    }
   };
 
   if (loading) return <div className="loading">Loading details...</div>;
-
-  // If loading is done but no report, the useEffect would have navigated away.
-  // But just in case, we return null or a loader.
   if (!report) return null;
 
   return (
     <div className="dashboard-container">
-      <Header user={user} onLogout={handleLogout} />
       <div className="report-details-container">
-        <button onClick={() => navigate(-1)} className="back-btn">
-          ← Back to Dashboard
-        </button>
+        <div className="report-details-header">
+          <button onClick={() => navigate(-1)} className="back-btn">
+            ← Back to Dashboard
+          </button>
+
+          {user.user_type === "patient" && (
+            <button onClick={openAssignModal} className="manage-access-btn">
+              Manage Access
+            </button>
+          )}
+        </div>
 
         <div className="details-grid">
           <div className="image-section">
@@ -129,6 +183,16 @@ const ReportDetails = () => {
           )}
         </div>
       </div>
+
+      <AssignDoctorModal
+        show={showAssignModal}
+        onClose={() => setShowAssignModal(false)}
+        allDoctors={allDoctors}
+        selectedDoctors={selectedDoctors}
+        onToggle={toggleDoctorSelection}
+        onSubmit={handleAssignSubmit}
+        assigning={assigning}
+      />
     </div>
   );
 };

@@ -1,19 +1,36 @@
 import React from "react";
 import "./Header.css";
 
-const Header = ({ user, onLogout }) => {
+const Header = ({ onLogout, isNarrow }) => {
+  const [showDropdown, setShowDropdown] = React.useState(false);
+
   return (
-    <div className="dashboard-header">
-      <div className="header-info">
-        <h1 className="header-title">Dashboard</h1>
-        <p className="header-welcome">
-          Welcome back, <strong>{user.name}</strong> ({user.user_type})
-        </p>
-        <small className="header-wallet">Wallet: {user.wallet}</small>
+    <div className="app-header">
+      <div className={`header-content ${isNarrow ? "narrow" : ""}`}>
+        <div className="header-left">
+          <h1 className="branding-title">Blockchain EHR</h1>
+        </div>
+        <div className="header-center">
+          {/* Empty center for original layout or future use */}
+        </div>
+        <div className="header-right">
+          <div className="user-menu-container">
+            <button
+              className="menu-trigger"
+              onClick={() => setShowDropdown(!showDropdown)}
+            >
+              ☰
+            </button>
+            {showDropdown && (
+              <div className="dropdown-menu">
+                <button onClick={onLogout} className="dropdown-item logout">
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-      <button onClick={onLogout} className="logout-btn">
-        Logout
-      </button>
     </div>
   );
 };

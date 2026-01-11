@@ -1,10 +1,18 @@
 .report-details-container {
   max-width: 1000px;
-  margin: 40px auto;
-  padding: 20px;
+  margin: 0 auto;
+  padding: 100px 20px 40px;
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  min-height: 100vh;
+}
+
+.report-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .back-btn {
@@ -13,13 +21,29 @@
   color: #6366f1;
   font-weight: 600;
   cursor: pointer;
-  margin-bottom: 20px;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
   border-radius: 8px;
   transition: all 0.2s;
+}
+
+.manage-access-btn {
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+.manage-access-btn:hover {
+  background: #4f46e5;
+  transform: translateY(-1px);
 }
 
 .back-btn:hover {

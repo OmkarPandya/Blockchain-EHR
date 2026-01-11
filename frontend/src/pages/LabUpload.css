@@ -1,5 +1,5 @@
 .lab-upload-container {
-  padding: 60px 20px;
+  padding: 100px 20px 40px;
   max-width: 900px;
   margin: 0 auto;
   min-height: 100vh;
@@ -71,37 +71,85 @@
   box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3);
 }
 
-.patients-list {
+.dropdown-container {
+  position: relative;
+  width: 100%;
+}
+
+.patients-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  margin-top: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 50;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.patient-dropdown-item {
+  padding: 12px 20px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--slate-100);
+  transition: background 0.2s;
+}
+
+.patient-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.patient-dropdown-item:hover {
+  background-color: var(--slate-50);
+}
+
+.patient-dropdown-item.selected {
+  background-color: var(--primary-light);
+}
+
+.patient-info {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-height: 350px;
-  overflow-y: auto;
-  padding-right: 10px;
+  margin-bottom: 4px;
 }
 
-.patient-item {
+.patient-name {
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.patient-email {
+  font-size: 0.85rem;
+  color: var(--slate-500);
+}
+
+.no-results {
   padding: 20px;
-  border: 2px solid var(--slate-100);
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.patient-item:hover {
-  background-color: var(--slate-50);
-  border-color: var(--slate-300);
-}
-
-.patient-item.selected {
-  background-color: var(--primary-light);
-  border-color: var(--primary);
+  text-align: center;
+  color: var(--slate-500);
+  font-style: italic;
 }
 
 .wallet-addr {
   color: var(--slate-400);
   font-family: "JetBrains Mono", monospace;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
 }
 
 .upload-form-section {

@@ -9,6 +9,7 @@ const LabUpload = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [file, setFile] = useState(null);
   const [hospital, setHospital] = useState("");
   const [reportType, setReportType] = useState("Blood Test");
@@ -18,15 +19,37 @@ const LabUpload = () => {
 
   const user = JSON.parse(localStorage.getItem("user"));
 
-  const handleSearch = async () => {
-    if (!searchQuery) return;
-    try {
-      const response = await searchPatients(searchQuery);
-      setPatients(response.data);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to search patients");
+  // Debounced search logic
+  React.useEffect(() => {
+    if (
+      !searchQuery ||
+      (selectedPatient && searchQuery === selectedPatient.name)
+    ) {
+      if (!searchQuery) {
+        setPatients([]);
+        setShowDropdown(false);
+      }
+      return;
     }
+
+    const delayDebounceFn = setTimeout(async () => {
+      try {
+        const response = await searchPatients(searchQuery);
+        setPatients(response.data);
+        setShowDropdown(true);
+      } catch (err) {
+        console.error("Search error:", err);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, selectedPatient]);
+
+  const handleSelectPatient = (patient) => {
+    setSelectedPatient(patient);
+    setSearchQuery(patient.name);
+    setShowDropdown(false);
+    setPatients([]);
   };
 
   const handleUpload = async (e) => {
@@ -65,32 +88,43 @@ const LabUpload = () => {
       {/* Search Section */}
       <div className="search-section card">
         <h3>1. Find Patient</h3>
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Search by Email or Name"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
-          />
-          <button onClick={handleSearch} className="search-btn">
-            Search
-          </button>
-        </div>
+        <div className="dropdown-container">
+          <div className="search-bar">
+            <input
+              type="text"
+              placeholder="Start typing patient's name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => searchQuery && setShowDropdown(true)}
+              className="search-input"
+            />
+          </div>
 
-        <div className="patients-list">
-          {patients.map((p) => (
-            <div
-              key={p.wallet}
-              onClick={() => setSelectedPatient(p)}
-              className={`patient-item ${
-                selectedPatient?.wallet === p.wallet ? "selected" : ""
-              }`}
-            >
-              <strong>{p.name}</strong> ({p.email})<br />
-              <small className="wallet-addr">Wallet: {p.wallet}</small>
+          {showDropdown && patients.length > 0 && (
+            <div className="patients-dropdown">
+              {patients.map((p) => (
+                <div
+                  key={p.wallet}
+                  onClick={() => handleSelectPatient(p)}
+                  className={`patient-dropdown-item ${
+                    selectedPatient?.wallet === p.wallet ? "selected" : ""
+                  }`}
+                >
+                  <div className="patient-info">
+                    <span className="patient-name">{p.name}</span>
+                    <span className="patient-email">{p.email}</span>
+                  </div>
+                  <small className="wallet-addr">Wallet: {p.wallet}</small>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
+
+          {showDropdown && searchQuery && patients.length === 0 && (
+            <div className="patients-dropdown">
+              <div className="no-results">No patients found</div>
+            </div>
+          )}
         </div>
       </div>
 

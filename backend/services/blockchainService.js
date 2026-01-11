@@ -142,3 +142,19 @@ export async function syncDoctorsOnContract(
     throw error;
   }
 }
+
+// ✅ Function to check if a user has access to a report on the contract
+export async function checkAccessOnContract(contractAddress, userWallet) {
+  try {
+    const contract = new web3.eth.Contract(abi, contractAddress);
+
+    // Check if the user is an owner of the report contract
+    const hasAccess = await contract.methods.isOwner(userWallet.toLowerCase()).call();
+
+    return hasAccess;
+  } catch (error) {
+    console.error("❌ Check access error:", error);
+    // If contract call fails (e.g. wrong address), return false for safety
+    return false;
+  }
+}
