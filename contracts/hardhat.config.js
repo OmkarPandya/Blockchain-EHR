@@ -1,13 +1,11 @@
 require("@nomiclabs/hardhat-ethers");
 require("@nomiclabs/hardhat-etherscan");
+require("dotenv").config();
 
-const fs = require("fs");
-let privateKey = "";
+const privateKey = process.env.PRIVATE_KEY || "";
 
-try {
-	privateKey = fs.readFileSync(".secret").toString().trim();
-} catch (err) {
-	console.warn("No .secret file found. Skipping private key for now.");
+if (!privateKey) {
+	console.warn("No PRIVATE_KEY found in .env file.");
 }
 
 module.exports = {
@@ -24,7 +22,7 @@ module.exports = {
 		// },
 	},
 	etherscan: {
-		apiKey: "T7EJKK22HARAGKTIQKGNVDJ3YSV6SET5C8",
+		apiKey: process.env.ETHERSCAN_API_KEY,
 	},
 	solidity: {
 		version: "0.8.13",
