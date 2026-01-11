@@ -1,0 +1,54 @@
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  padding: 24px 32px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  position: sticky;
+  top: 20px;
+  z-index: 100;
+  animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.header-title {
+  font-size: 1.75rem;
+  color: var(--slate-900);
+  letter-spacing: -0.025em;
+}
+
+.header-welcome {
+  margin: 4px 0 0;
+  color: var(--slate-500);
+  font-size: 0.95rem;
+}
+
+.header-wallet {
+  color: var(--slate-400);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  display: block;
+}
+
+.logout-btn {
+  padding: 10px 24px;
+  background-color: var(--danger);
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.logout-btn:hover {
+  background-color: var(--danger-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(239, 68, 68, 0.3);
+}

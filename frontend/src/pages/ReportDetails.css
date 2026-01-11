@@ -1,0 +1,142 @@
+.report-details-container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #6366f1;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.back-btn:hover {
+  background: #f5f3ff;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.image-section img {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.info-section h2 {
+  margin-top: 0;
+  color: #1e293b;
+  font-size: 1.8rem;
+}
+
+.detail-item {
+  margin-bottom: 20px;
+}
+
+.detail-item label {
+  display: block;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.detail-item p {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #334155;
+}
+
+.doctors-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 5px;
+  justify-content: center;
+}
+
+.doctor-badge {
+  background: #e0e7ff;
+  color: #4338ca;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.comments-section {
+  margin-top: 40px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 30px;
+}
+
+.comments-section h3 {
+  margin-top: 0;
+  color: #1e293b;
+  margin-bottom: 20px;
+}
+
+.comment-card {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  border-left: 4px solid #6366f1;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.comment-doctor {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.comment-date {
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.comment-text {
+  margin: 0;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.no-comments {
+  text-align: center;
+  color: #94a3b8;
+  padding: 40px;
+  background: #f8fafc;
+  border-radius: 12px;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.text-center {
+  text-align: center;
+}
