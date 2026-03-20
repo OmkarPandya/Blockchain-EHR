@@ -27,5 +27,7 @@ router.get("/doctors", protect, userController.getDoctors);
 
 // @route   GET /api/users/:id
 router.get("/:id", protect, userController.getUserById);
+// @route   PUT /api/users/profile
+router.put("/profile", protect, userController.updateProfile);
 
 export default router;

@@ -167,7 +167,20 @@ const LabUpload = () => {
             <input
               type="file"
               required
-              onChange={(e) => setFile(e.target.files[0])}
+              accept=".pdf,image/png,image/jpeg,image/jpg"
+              onChange={(e) => {
+                const selectedFile = e.target.files[0];
+                if (selectedFile) {
+                  const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+                  if (!allowedTypes.includes(selectedFile.type)) {
+                    toast.error("Invalid format. Please upload a PDF, JPG, or PNG file.");
+                    e.target.value = null;
+                    setFile(null);
+                    return;
+                  }
+                  setFile(selectedFile);
+                }
+              }}
               className="file-input"
             />
           </div>

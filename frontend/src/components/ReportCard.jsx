@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
 import { useNavigate } from "react-router-dom";
 import "./ReportCard.css";
 
 const ReportCard = ({ report, user, onAssign, onComment }) => {
   const navigate = useNavigate();
+  const [showImageModal, setShowImageModal] = useState(false);
   return (
     <div className="report-card">
       <div className="report-header">
@@ -18,7 +20,7 @@ const ReportCard = ({ report, user, onAssign, onComment }) => {
         <h3 className="hospital-name">{report.hospital}</h3>
         {user.user_type === "doctor" && (
           <p className="patient-wallet">
-            Patient: {report.patient.substring(0, 10)}...
+            Patient: {report.patientName ? report.patientName : `${report.patient.substring(0, 10)}...`}
           </p>
         )}
       </div>
@@ -45,14 +47,13 @@ const ReportCard = ({ report, user, onAssign, onComment }) => {
       {/* Comments section removed from card as requested */}
 
       <div className="report-actions">
-        <a
-          href={report.scan}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          onClick={() => setShowImageModal(true)}
           className="view-link"
+          style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: "1rem" }}
         >
           View Image ↗
-        </a>
+        </button>
 
         <button
           onClick={() => navigate(`/reports/${report._id}`)}
@@ -77,6 +78,30 @@ const ReportCard = ({ report, user, onAssign, onComment }) => {
           </button>
         )}
       </div>
+
+      {showImageModal && ReactDOM.createPortal(
+        <div 
+          className="modal-overlay" 
+          onClick={() => setShowImageModal(false)}
+          style={{ cursor: "zoom-out", zIndex: 9999 }}
+        >
+          <object 
+            data={report.scan} 
+            aria-label="Full Resolution Scan" 
+            style={{ width: "90vw", height: "90vh", borderRadius: "8px", backgroundColor: "white", cursor: "default" }} 
+            onClick={(e) => e.stopPropagation()} 
+          >
+            <iframe src={report.scan} style={{ width: "100%", height: "100%", border: "none" }} title="Report Preview"></iframe>
+          </object>
+          <button 
+            onClick={() => setShowImageModal(false)}
+            style={{ position: "absolute", top: "20px", right: "30px", background: "white", color: "#333", border: "none", borderRadius: "50%", width: "40px", height: "40px", fontSize: "20px", cursor: "pointer", fontWeight: "bold", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
+          >
+            ✕
+          </button>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

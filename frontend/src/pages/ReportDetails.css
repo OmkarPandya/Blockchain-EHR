@@ -25,6 +25,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
+  margin: 0;
   border-radius: 8px;
   transition: all 0.2s;
 }
@@ -114,6 +115,7 @@
   margin-top: 0;
   color: #1e293b;
   margin-bottom: 20px;
+  text-align: left;
 }
 
 .comment-card {
@@ -122,6 +124,7 @@
   border-radius: 12px;
   margin-bottom: 16px;
   border-left: 4px solid #6366f1;
+  text-align: left;
 }
 
 .comment-header {

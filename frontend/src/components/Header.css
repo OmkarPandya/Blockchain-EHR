@@ -60,6 +60,20 @@
 
 .user-menu-container {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.user-name-display {
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+  color: var(--slate-700);
+  font-size: 0.95rem;
 }
 
 .menu-trigger {

@@ -39,4 +39,9 @@ export const lookupWallets = async (wallets) => {
     return await API.post("/users/lookup", { wallets });
 };
 
+// Update user profile
+export const updateProfile = async (userData) => {
+    return await API.put("/users/profile", userData);
+};
+
 export default API;

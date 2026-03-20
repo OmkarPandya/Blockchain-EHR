@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 import { useParams, useNavigate } from "react-router-dom";
-import { getReportById, assignDoctors } from "../api/report";
+import { getReportById, assignDoctors, addDoctorComment } from "../api/report";
 import { getDoctors } from "../api/auth";
 import AssignDoctorModal from "../components/AssignDoctorModal";
+import AddCommentModal from "../components/AddCommentModal";
 import { toast } from "react-hot-toast";
 import "./ReportDetails.css";
 
@@ -18,6 +20,10 @@ const ReportDetails = () => {
   const [allDoctors, setAllDoctors] = useState([]);
   const [selectedDoctors, setSelectedDoctors] = useState([]);
   const [assigning, setAssigning] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [showCommentModal, setShowCommentModal] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [submittingComment, setSubmittingComment] = useState(false);
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -94,6 +100,30 @@ const ReportDetails = () => {
     }
   };
 
+  const handleCommentSubmit = async () => {
+    if (!commentText.trim()) return toast.error("Please enter comment text");
+
+    setSubmittingComment(true);
+    try {
+      await addDoctorComment({
+        reportId: report._id,
+        doctorWallet: user.wallet,
+        doctorName: user.name,
+        content: commentText,
+      });
+      toast.success("Comment added successfully!");
+      setShowCommentModal(false);
+      
+      // Refresh report details
+      const response = await getReportById(id);
+      setReport(response.data);
+    } catch (err) {
+      toast.error("Failed to add comment");
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
   if (loading) return <div className="loading">Loading details...</div>;
   if (!report) return null;
 
@@ -110,25 +140,44 @@ const ReportDetails = () => {
               Manage Access
             </button>
           )}
+
+          {user.user_type === "doctor" && (
+            <button 
+              onClick={() => { setCommentText(""); setShowCommentModal(true); }} 
+              className="manage-access-btn" 
+              style={{ background: "var(--primary)" }}
+            >
+              + Add Comment
+            </button>
+          )}
         </div>
 
         <div className="details-grid">
           <div className="image-section">
-            <img src={report.scan} alt="Medical Scan" />
+            <object 
+              data={report.scan} 
+              aria-label="Medical Scan" 
+              style={{ width: "100%", height: "400px", borderRadius: "12px", backgroundColor: "#f8fafc" }}
+            >
+              <iframe src={report.scan} style={{ width: "100%", height: "400px", border: "none" }} title="Report"></iframe>
+            </object>
             <div className="mt-4" style={{ marginTop: "15px" }}>
-              <a
-                href={report.scan}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => setShowImageModal(true)}
                 className="view-link"
                 style={{
                   color: "#6366f1",
                   textDecoration: "none",
                   fontWeight: "bold",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: 0,
+                  fontSize: "1rem"
                 }}
               >
-                Open Full Resolution Image ↗
-              </a>
+                View Full Resolution Image ↗
+              </button>
             </div>
           </div>
 
@@ -193,6 +242,39 @@ const ReportDetails = () => {
         onSubmit={handleAssignSubmit}
         assigning={assigning}
       />
+
+      <AddCommentModal
+        show={showCommentModal}
+        onClose={() => setShowCommentModal(false)}
+        commentText={commentText}
+        onCommentChange={setCommentText}
+        onSubmit={handleCommentSubmit}
+        submitting={submittingComment}
+      />
+
+      {showImageModal && ReactDOM.createPortal(
+        <div 
+          className="modal-overlay" 
+          onClick={() => setShowImageModal(false)}
+          style={{ cursor: "zoom-out", zIndex: 9999 }}
+        >
+          <object 
+            data={report.scan} 
+            aria-label="Full Resolution Scan" 
+            style={{ width: "90vw", height: "90vh", borderRadius: "8px", backgroundColor: "white", cursor: "default" }} 
+            onClick={(e) => e.stopPropagation()} 
+          >
+            <iframe src={report.scan} style={{ width: "100%", height: "100%", border: "none" }} title="Report Preview"></iframe>
+          </object>
+          <button 
+            onClick={() => setShowImageModal(false)}
+            style={{ position: "absolute", top: "20px", right: "30px", background: "white", color: "#333", border: "none", borderRadius: "50%", width: "40px", height: "40px", fontSize: "20px", cursor: "pointer", fontWeight: "bold", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
+          >
+            ✕
+          </button>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

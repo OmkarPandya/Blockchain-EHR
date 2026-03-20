@@ -269,15 +269,22 @@ const getDoctorReports = async (req, res) => {
     // Find reports where the doctor wallet is in the doctors array
     const reports = await Report.find({
       doctors: { $regex: new RegExp(`^${wallet}$`, "i") },
-    }).sort({ date: -1 });
+    }).sort({ date: -1 }).lean();
 
-    // Privacy Filter: Remove comments by other doctors
+    const patientWallets = [...new Set(reports.map(r => r.patient))];
+    const patientInfos = await User.find({
+      wallet: { $in: patientWallets.map(w => new RegExp(`^${w}$`, "i")) }
+    }, 'name wallet').lean();
+
+    // Privacy Filter & Enrich: Remove comments by other doctors, attach patientName
     const filteredReports = reports.map(report => {
-      const reportObj = report.toObject();
-      reportObj.comments = reportObj.comments.filter(c =>
+      const pInfo = patientInfos.find(p => p.wallet.toLowerCase() === report.patient.toLowerCase());
+      report.patientName = pInfo ? pInfo.name : null;
+
+      report.comments = (report.comments || []).filter(c =>
         c.doctorWallet.toLowerCase() === wallet.toLowerCase()
       );
-      return reportObj;
+      return report;
     });
 
     return res.json(filteredReports);

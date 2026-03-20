@@ -11,6 +11,7 @@ const Register = () => {
     email: "",
     user_type: "patient",
     wallet: "",
+    ayushmanCardNumber: "",
   });
   const [availableWallets, setAvailableWallets] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -91,6 +92,15 @@ const Register = () => {
             <option value="doctor">Doctor</option>
             <option value="laboratory">Laboratory</option>
           </select>
+        </div>
+        <div className="input-group">
+          <input
+            name="ayushmanCardNumber"
+            type="text"
+            placeholder="Ayushman Card Number (Optional)"
+            onChange={handleChange}
+            className="auth-input"
+          />
         </div>
         <div className="input-group">
           <label

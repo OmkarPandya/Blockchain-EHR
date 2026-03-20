@@ -149,6 +149,36 @@ const lookupWallets = async (req, res) => {
   }
 };
 
+// Update user profile (name, email)
+const updateProfile = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    
+    // req.user is set by the protect middleware
+    const user = await User.findById(req.user._id);
+    
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    user.name = name || user.name;
+    user.email = email || user.email;
+
+    const updatedUser = await user.save();
+    
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      wallet: updatedUser.wallet,
+      user_type: updatedUser.user_type,
+      ayushmanCardNumber: updatedUser.ayushmanCardNumber
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export default {
   registerUser,
   getAllUsers,
@@ -158,4 +188,5 @@ export default {
   searchPatients,
   getDoctors,
   lookupWallets,
+  updateProfile,
 };

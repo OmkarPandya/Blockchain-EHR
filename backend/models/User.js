@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema({
   phone: { type: String },
   user_type: { type: String, required: true }, // e.g., "doctor", "patient", "laboratory"
   address: { type: String },
+  ayushmanCardNumber: { type: String },
 });
 
 const User = mongoose.model("User", UserSchema);
