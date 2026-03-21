@@ -6,6 +6,8 @@ import {
   assignDoctors,
   getDoctorReports,
   addDoctorComment,
+  getLabReports,
+  changeReportPatient,
 } from "../api/report";
 import { getDoctors } from "../api/auth";
 
@@ -13,6 +15,7 @@ import { getDoctors } from "../api/auth";
 import ReportCard from "../components/ReportCard";
 import AssignDoctorModal from "../components/AssignDoctorModal";
 import AddCommentModal from "../components/AddCommentModal";
+import ChangePatientModal from "../components/ChangePatientModal";
 
 // Styles
 import "./Dashboard.css";
@@ -26,6 +29,7 @@ const Dashboard = () => {
   // Modal states
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);
+  const [showChangePatientModal, setShowChangePatientModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
 
@@ -37,6 +41,9 @@ const Dashboard = () => {
   // Add Comment states
   const [commentText, setCommentText] = useState("");
   const [submittingComment, setSubmittingComment] = useState(false);
+  
+  // Change Patient states
+  const [updatingPatient, setUpdatingPatient] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -55,6 +62,8 @@ const Dashboard = () => {
         response = await getPatientReports(user.wallet);
       } else if (user.user_type === "doctor") {
         response = await getDoctorReports(user.wallet);
+      } else if (user.user_type === "laboratory") {
+        response = await getLabReports(user.wallet);
       }
 
       if (response) {
@@ -136,6 +145,25 @@ const Dashboard = () => {
     }
   };
 
+  const openChangePatientModal = (report) => {
+    setSelectedReport(report);
+    setShowChangePatientModal(true);
+  };
+
+  const handleChangePatientSubmit = async (newPatientWallet) => {
+    setUpdatingPatient(true);
+    try {
+      await changeReportPatient(selectedReport._id, newPatientWallet);
+      toast.success("Assigned patient updated successfully!");
+      setShowChangePatientModal(false);
+      fetchReports();
+    } catch (err) {
+      toast.error("Failed to update assigned patient");
+    } finally {
+      setUpdatingPatient(false);
+    }
+  };
+
   if (!user) {
     navigate("/");
     return null;
@@ -156,12 +184,14 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Reports View (Patients & Doctors) */}
-      {(user.user_type === "patient" || user.user_type === "doctor") && (
+      {/* Reports View (Patients, Doctors & Labs) */}
+      {(user.user_type === "patient" || user.user_type === "doctor" || user.user_type === "laboratory") && (
         <div className="reports-view">
           <h2 className="reports-title">
             {user.user_type === "patient"
               ? "My Medical Reports"
+              : user.user_type === "laboratory"
+              ? "Reports Uploaded by Me"
               : "Reports Assigned to Me"}
           </h2>
 
@@ -176,6 +206,7 @@ const Dashboard = () => {
                   user={user}
                   onAssign={openAssignModal}
                   onComment={openCommentModal}
+                  onChangePatient={openChangePatientModal}
                 />
               ))}
             </div>
@@ -204,6 +235,14 @@ const Dashboard = () => {
         onCommentChange={setCommentText}
         onSubmit={handleCommentSubmit}
         submitting={submittingComment}
+      />
+
+      <ChangePatientModal
+        show={showChangePatientModal}
+        onClose={() => setShowChangePatientModal(false)}
+        onSubmit={handleChangePatientSubmit}
+        updating={updatingPatient}
+        currentPatientName={selectedReport?.patientName || selectedReport?.patient}
       />
     </div>
   );

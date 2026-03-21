@@ -141,6 +141,7 @@ const uploadLabReport = async (req, res) => {
       scan: url,
       doctors: [], // Initialize with empty array
       patient: patientWallet,
+      labWallet: labWallet, // Save lab creator
       hospital,
       reportType: reportType || "Lab Report",
       date: new Date(),
@@ -328,6 +329,65 @@ const addDoctorComment = async (req, res) => {
   }
 };
 
+// Get reports uploaded by a specific laboratory
+const getLabReports = async (req, res) => {
+  try {
+    const { wallet } = req.params;
+    if (!wallet) return res.status(400).json({ error: "Lab wallet is required" });
+
+    // Authorization
+    if (req.user.user_type === 'laboratory' && req.user.wallet.toLowerCase() !== wallet.toLowerCase()) {
+      return res.status(403).json({ error: "Access denied: You can only view reports you uploaded" });
+    }
+
+    const reports = await Report.find({
+      labWallet: { $regex: new RegExp(`^${wallet}$`, "i") },
+    }).sort({ date: -1 }).lean();
+
+    const patientWallets = [...new Set(reports.map(r => r.patient))];
+    const patientInfos = await User.find({
+      wallet: { $in: patientWallets.map(w => new RegExp(`^${w}$`, "i")) }
+    }, 'name wallet').lean();
+
+    const enrichedReports = reports.map(report => {
+      const pInfo = patientInfos.find(p => p.wallet.toLowerCase() === report.patient.toLowerCase());
+      report.patientName = pInfo ? pInfo.name : null;
+      return report;
+    });
+
+    return res.json(enrichedReports);
+  } catch (err) {
+    console.error("Get Lab Reports Error:", err);
+    return res.status(500).json({ error: "Failed to fetch lab reports" });
+  }
+};
+
+// Change the assigned patient of a report (For Lab Users)
+const changeReportPatient = async (req, res) => {
+  try {
+    const { reportId, newPatientWallet } = req.body;
+    if (!reportId || !newPatientWallet) {
+      return res.status(400).json({ error: "Report ID and new patient wallet are required" });
+    }
+
+    const report = await Report.findById(reportId);
+    if (!report) return res.status(404).json({ error: "Report not found" });
+
+    // Verify ownership
+    if (report.labWallet.toLowerCase() !== req.user.wallet.toLowerCase()) {
+       return res.status(403).json({ error: "Access denied: You did not upload this report" });
+    }
+
+    report.patient = newPatientWallet;
+    await report.save();
+
+    return res.json({ message: "Assigned patient changed successfully", patient: newPatientWallet });
+  } catch (err) {
+    console.error("Change Patient Error:", err);
+    return res.status(500).json({ error: "Failed to change patient" });
+  }
+};
+
 export default {
   uploadReport,
   getAllReports,
@@ -338,4 +398,6 @@ export default {
   getDoctorReports,
   addDoctorComment,
   getReportById,
+  getLabReports,
+  changeReportPatient,
 };

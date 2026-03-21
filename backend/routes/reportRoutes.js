@@ -29,7 +29,13 @@ router.post("/assign-doctors", protect, authorize("patient"), reportController.a
 // @route   GET /api/reports/doctor/:wallet
 router.get("/doctor/:wallet", protect, authorize("doctor"), reportController.getDoctorReports);
 
+// @route   GET /api/reports/lab/:wallet
+router.get("/lab/:wallet", protect, authorize("laboratory"), reportController.getLabReports);
+
 // @route   POST /api/reports/add-comment
 router.post("/add-comment", protect, authorize("doctor"), validateReportAccess, reportController.addDoctorComment);
+
+// @route   POST /api/reports/change-patient
+router.post("/change-patient", protect, authorize("laboratory"), reportController.changeReportPatient);
 
 export default router;

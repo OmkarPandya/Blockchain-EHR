@@ -69,14 +69,22 @@ const ReportCard = ({ report, user, onAssign, onComment }) => {
           >
             Manage Access
           </button>
-        ) : (
+        ) : user.user_type === "doctor" ? (
           <button
             onClick={() => onComment(report)}
             className="action-btn doctor-btn"
           >
             + Add Comment
           </button>
-        )}
+        ) : user.user_type === "laboratory" ? (
+          <button
+            onClick={() => onChangePatient(report)}
+            className="action-btn patient-btn"
+            style={{ backgroundColor: "#0284c7" }}
+          >
+            Change Patient
+          </button>
+        ) : null}
       </div>
 
       {showImageModal && ReactDOM.createPortal(
