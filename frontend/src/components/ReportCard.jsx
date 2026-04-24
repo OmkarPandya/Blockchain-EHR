@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { useNavigate } from "react-router-dom";
 import "./ReportCard.css";
 
-const ReportCard = ({ report, user, onAssign, onComment }) => {
+const ReportCard = ({ report, user, onAssign, onComment, onChangePatient }) => {
   const navigate = useNavigate();
   const [showImageModal, setShowImageModal] = useState(false);
   return (
@@ -18,7 +18,7 @@ const ReportCard = ({ report, user, onAssign, onComment }) => {
           </small>
         </div>
         <h3 className="hospital-name">{report.hospital}</h3>
-        {user.user_type === "doctor" && (
+        {(user.user_type === "doctor" || user.user_type === "laboratory") && (
           <p className="patient-wallet">
             Patient: {report.patientName ? report.patientName : `${report.patient.substring(0, 10)}...`}
           </p>

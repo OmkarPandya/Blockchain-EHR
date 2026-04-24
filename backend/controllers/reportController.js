@@ -375,7 +375,7 @@ const changeReportPatient = async (req, res) => {
 
     // Verify ownership
     if (report.labWallet.toLowerCase() !== req.user.wallet.toLowerCase()) {
-       return res.status(403).json({ error: "Access denied: You did not upload this report" });
+      return res.status(403).json({ error: "Access denied: You did not upload this report" });
     }
 
     report.patient = newPatientWallet;
